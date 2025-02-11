@@ -1,0 +1,89 @@
+---
+title: "recapr_exercise"
+author: "Kyle Burt"
+format: html
+editor: visual
+---
+
+# Libraries
+
+```{r}
+library(here)
+library(tidyverse)
+library(recapr)
+```
+
+'recapr' package https://cran.r-project.org/web/packages/recapr/recapr.pdf
+
+# EXAMPLE
+
+```{r}
+n1<-75 # number of individuals marked in the first sampling
+n2<-100 # number of individuals captured in the second sampling effort
+m2<- 4 # number of individuals in the second sampling effort that were marked.
+```
+
+### Runs the model, get the estimate of N and calculates a confidence interval
+
+```{r}
+NPetersen(n1, n2, m2) # estimates the population size
+ciPetersen(n1,n2,m2)  # 95% CIs using normal approximation ($ciNorm) and bootstrapping ($ciBoot)
+```
+
+# 1. Run the Petersen Estimator for the Silver Carp parameters
+
+### Example from lecture notes; Sass et al. (2010) Silver carp study
+
+```{r}
+n1_sc <- 4540
+n2_sc <- 2239 #approximated from the paper (not reported)
+m2_sc <- 30
+```
+
+### Chapman estimator
+
+```{r}
+NChapman(n1_sc, n2_sc, m2_sc)
+ciChapman(n1_sc, n2_sc, m2_sc)
+```
+
+### Petersen estimator
+
+```{r}
+NPetersen(n1_sc, n2_sc, m2_sc) 
+ciPetersen(n1_sc, n2_sc,m2_sc)
+```
+
+### 2. What is the difference between the Petersen and Chapman estimates and the confidence intervals
+
+-   Difference in Estimates: 338,835.3 - 328,122.9 = 10,712.4 individuals
+
+-   Petersen confidence intervals: Normal (218,401.9 to 459,268.7); Bootstrap (247,928.3 to 508,253.0)
+
+-   Chapman confidence intervals: Normal (215,611 to 440,635); Bootstrap (242,186 to 484,372)
+
+# PORTFOLIO ASSIGNMENT
+
+N1 = 78 N2 = 168 m2 = 19
+
+```{r}
+n1_mm <- 78
+n2_mm <- 168
+m2_mm <- 19
+```
+
+```{r}
+NChapman(n1_mm, n2_mm, m2_mm)
+ciChapman(n1_mm, n2_mm, m2_mm)
+```
+
+```{r}
+NPetersen(n1_mm, n2_mm, m2_mm) 
+ciPetersen(n1_mm, n2_mm,m2_mm)
+```
+
+### 3. How many M&Ms are in this bag?
+
+-   Chapman estimate = 666.55
+
+-   Petersen estimate = 689.6842
