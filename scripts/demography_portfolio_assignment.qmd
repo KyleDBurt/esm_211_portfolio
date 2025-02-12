@@ -258,7 +258,7 @@ Now that you've modeled and forecasted the data, it's time to plot the results! 
 ```{r}
 # plot the forecasted fertility or mortality rates
 plot_demog_forecast(
-  forecast_data = aus_fert_forecast, # output from forecast function
+  forecast_data = fr_mort_forecast, # output from forecast function
   plot_type = 'fertility') 
 ```
 
