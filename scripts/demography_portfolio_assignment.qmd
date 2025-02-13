@@ -204,7 +204,9 @@ If you get stuck at all, reference the Australian fertility example above. You c
 fr_demog <- fr.mort
 ```
 
-#### For the French mortality data, use the following parameters in the Lee-Carter model and forecast:
+We'll get you started with the code to model French mortality using the Lee-Carter approach. Then, it'll be up to you to forecast the data and plot the projected mortality rates.
+
+#### Lee-Carter model
 
 -   **Modeling mortality using the Lee-Carter approach**:
     -   the name of the series containing mortality rates for both males and females (hint: you need to use the `names()` function to access the `rate` list, but because there are three series in this `demogdata` object, you need to specify which one you want to use)
@@ -212,34 +214,25 @@ fr_demog <- fr.mort
     -   an upper age of `100`
     -   the `dt` method of adjustment for coefficients
     -   the `rate` method for calculating residuals
+
+```{r}
+# model mortality data using Lee-Carter approach
+fr_mort_lca <- lca(data = fr_demog,
+                   series = names(fr_demog$rate)[1],  
+                   years = fr_demog$year,
+                   ages = fr_demog$age,
+                   max.age = 100, 
+                   adjust = "dt", 
+                   restype = "rate")
+```
+
+#### Forecasting mortality
+
 -   **Forecasting mortality**:
     -   forecast `50` years into the future
     -   use the `innovdrift` method to calculate SEs
     -   use the `fit` method to compute jumpchoice
     -   specify a confidence level of `80` for prediction intervals
-
-We'll get you started with the code to model French mortality using the Lee-Carter approach. Then, it'll be up to you to forecast the data and plot the projected mortality rates.
-
-#### Lee-Carter model
-
-```{r}
-# model mortality data using Lee-Carter approach
-fr_mort_lca <- lca(data = fr_demog, # demogdata object 
-                   # name of series w/in data containing mortality rates
-                   series = names(fr_demog$rate)[1],  
-                   # years to include in fitting the model
-                   years = fr_demog$year,
-                   # ages to include in fitting the model
-                   ages = fr_demog$age,
-                   # upper age to include in the fit (110 for Fr data)
-                   max.age = 100, 
-                   # method to use for adjustment of coefficients (dt for lca)
-                   adjust = "dt", 
-                   # method used for calculating residuals (rate for this ex)
-                   restype = "rates")
-```
-
-#### Forecasting mortality
 
 ```{r}
 fr_mort_forecast <- forecast(object = fr_mort_lca,
@@ -253,25 +246,25 @@ fr_mort_forecast <- forecast(object = fr_mort_lca,
 
 Now that you've modeled and forecasted the data, it's time to plot the results! Use the `plot_forecast_projections()` function to plot the forecasted fertility or mortality rates. Refer to the example and function explanation above for more information on plotting the results of your LCA model and forecast. Page 33 of the [demography CRAN documentation](https://cran.r-project.org/web/packages/demography/demography.pdf) is another good source for an external method of plotting this data.
 
-# Here as of 4:21PM on 2/11/25
-
 ```{r}
-# plot the forecasted fertility or mortality rates
+# plot the forecasted mortality rate
 plot_demog_forecast(
-  forecast_data = fr_mort_forecast, # output from forecast function
-  plot_type = 'fertility') 
+  forecast_data = fr_mort_forecast,
+  plot_type = 'mortality') 
 ```
 
 ## Thought Exercises
 
 #### Q. 1 As you've learned, the Lee-Carter model can be used to forecast mortality or fertility rates. In the context of the code you ran, what do the parameters `series`, `years`, and `ages` represent in the `lca()` function?
 
--   ...
+- 'series' defines the demographic series to be analyzed
+- 'years' represents the range of years included in the analysis
+- 'ages' represents the age groups included in the analysis
 
 #### Q. 2 What do all of the colorful lines represent in the forecasted fertility or mortality rates plot?
 
--   ...
+-   The lines represent individual years from 2010 to 2050
 
 #### Q. 3 Looking at the forecasted fertility or mortality rates plot, what trends do you observe?
 
--   ...
+-   Regarding forecasted mortality, there is a large disparity at the early ages but a small disparity at the later ages. This indicates that less people are expected to die at a young age in the future, but the number of older people who are expected to die will largely remain unchanged.
