@@ -153,9 +153,19 @@ exp(sgr$approx)
 
 Portfolio: Hudsonia montana
 
-# Questions
+# Read in data
 
-### What is the population growth rate for each year of available data (1985-1988)? Use the deterministic approach.
+```{r}
+hudsonia <- hudsonia
+```
+
+# What is the population growth rate for each year of available data (1985-1988)? Use the deterministic approach.
+
+### Population growth rate 1985
+
+```{r}
+
+```
 
 ### What is the stochastic growth rate?
 
