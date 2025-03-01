@@ -257,9 +257,9 @@ plot_demog_forecast(
 
 #### Q. 1 As you've learned, the Lee-Carter model can be used to forecast mortality or fertility rates. In the context of the code you ran, what do the parameters `series`, `years`, and `ages` represent in the `lca()` function?
 
-- 'series' defines the demographic series to be analyzed
-- 'years' represents the range of years included in the analysis
-- 'ages' represents the age groups included in the analysis
+-   'series' defines the demographic series to be analyzed
+-   'years' represents the range of years included in the analysis
+-   'ages' represents the age groups included in the analysis
 
 #### Q. 2 What do all of the colorful lines represent in the forecasted fertility or mortality rates plot?
 
@@ -268,5 +268,3 @@ plot_demog_forecast(
 #### Q. 3 Looking at the forecasted fertility or mortality rates plot, what trends do you observe?
 
 -   Regarding forecasted mortality, there is a large disparity at the early ages but a small disparity at the later ages. This indicates that less people are expected to die at a young age in the future, but the number of older people who are expected to die will largely remain unchanged.
-
-# Done 2/13/25
