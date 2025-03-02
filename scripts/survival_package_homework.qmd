@@ -58,6 +58,21 @@ summary(quagga_sfit)
 
 Now that a survival curve fits the data, visualize it with a Kaplan-Meier plot using the survminer package and the ggsurvplot() function. Show your plot. Compare the survival outcomes of the 2 treatments. Which treatment appears more effective? Why? And what do the “+” symbols on the curves represent?
 
-### Q3
+```{r}
+ggsurvplot(quagga_sfit)
+```
+
+A calcium concentration of 12ppm appears to be more effective because 100% probability of survival persists for a greater amount of time and survival remains higher in this concentration up until the final time point. The “+” symbols represent censored data points.
+
+### Q3: problem setting treatments as factors
 
 Now add confidence intervals to your plot, show the p-value for the log-rank test visually, show a risk table below the plot, and change the colors and the group labels. Interpret the p-value from the log-rank test. What does this p-value indicate about the difference in survival probabilities between the two calcium treatments?
+
+```{r}
+ggsurvplot(quagga_sfit, conf.int = TRUE, pval = TRUE, 
+           risk.table = TRUE, 
+           legend.labs = c("9 ppm", "12 ppm"), legend.title = "Treatment",  
+           palette = c("mediumorchid", "forestgreen"), 
+           title = "Kaplan-Meier Curve for Quagga Mussel Survival", 
+           risk.table.height = .15)
+```
