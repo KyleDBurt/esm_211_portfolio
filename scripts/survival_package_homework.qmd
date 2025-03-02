@@ -1,0 +1,24 @@
+---
+title: "survival_package_homework"
+author: "Kyle Burt"
+format: html
+editor: visual
+---
+
+# Context
+
+You have been hired to determine the risk of quagga mussel establishment into water bodies of the western US (e.g. Lake Tahoe). Use the questions below to analyze survival rates and the survival curve of mussels under different calcium concentrations. Calcium is critical for mussel growth and physiology
+
+# Questions
+
+### Q1
+
+Using the provided data, create a survival object and fit the survival curves separately by treatment. Show/Provide the life tables for both treatments (a life table presents information on the number at risk (number still remaining) and the cumulative survival at that instant).
+
+### Q2
+
+Now that a survival curve fits the data visualize it with a Kaplan-Meier plot using the survminer package and the ggsurvplot() function. Show your plot. Compare the survival outcomes of the 2 treatments. Which treatment appears more effective? Why? And what do the “+” symbols on the curves represent?
+
+### Q3
+
+Now add confidence intervals to your plot, show the p-value for the log-rank test visually, show a risk table below the plot, and change the colors and the group labels. Interpret the p-value from the log-rank test. What does this p-value indicate about the difference in survival probabilities between the two calcium treatments?
