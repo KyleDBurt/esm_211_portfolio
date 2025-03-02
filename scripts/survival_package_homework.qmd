@@ -15,6 +15,37 @@ You have been hired to determine the risk of quagga mussel establishment into wa
 
 Using the provided data, create a survival object and fit the survival curves separately by treatment. Show/Provide the life tables for both treatments (a life table presents information on the number at risk (number still remaining) and the cumulative survival at that instant).
 
+#### Libraries
+
+```{r}
+library(tidyverse)
+library(here)
+library(survival)
+library(survminer)
+```
+
+#### Load data
+
+```{r}
+raw_quagga <- read.csv(here("data", "Davis_quagga_mussels.csv"))
+```
+
+#### Convert data into tibble
+
+```{r}
+quagga_tibble <- as_tibble(raw_quagga)
+
+print(quagga_tibble)
+```
+
+#### Create survival object and fit to a curve separately by treatment
+
+```{r}
+quagga_sfit <- survfit(Surv(day, status) ~ treatment, data = quagga_tibble)
+
+plot(quagga_sfit)
+```
+
 ### Q2
 
 Now that a survival curve fits the data visualize it with a Kaplan-Meier plot using the survminer package and the ggsurvplot() function. Show your plot. Compare the survival outcomes of the 2 treatments. Which treatment appears more effective? Why? And what do the “+” symbols on the curves represent?
