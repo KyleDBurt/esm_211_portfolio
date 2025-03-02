@@ -9,13 +9,7 @@ editor: visual
 
 You have been hired to determine the risk of quagga mussel establishment into water bodies of the western US (e.g. Lake Tahoe). Use the questions below to analyze survival rates and the survival curve of mussels under different calcium concentrations. Calcium is critical for mussel growth and physiology
 
-# Questions
-
-### Q1
-
-Using the provided data, create a survival object and fit the survival curves separately by treatment. Show/Provide the life tables for both treatments (a life table presents information on the number at risk (number still remaining) and the cumulative survival at that instant).
-
-#### Libraries
+# Libraries
 
 ```{r}
 library(tidyverse)
@@ -24,11 +18,17 @@ library(survival)
 library(survminer)
 ```
 
-#### Load data
+# Load data
 
 ```{r}
 raw_quagga <- read.csv(here("data", "Davis_quagga_mussels.csv"))
 ```
+
+# Questions
+
+### Q1
+
+Using the provided data, create a survival object and fit the survival curves separately by treatment. Show/Provide the life tables for both treatments (a life table presents information on the number at risk (number still remaining) and the cumulative survival at that instant).
 
 #### Convert data into tibble
 
@@ -46,9 +46,17 @@ quagga_sfit <- survfit(Surv(day, status) ~ treatment, data = quagga_tibble)
 plot(quagga_sfit)
 ```
 
+#### Life tables for both treatments
+
+```{r}
+summary(quagga_sfit)$table
+
+summary(quagga_sfit)
+```
+
 ### Q2
 
-Now that a survival curve fits the data visualize it with a Kaplan-Meier plot using the survminer package and the ggsurvplot() function. Show your plot. Compare the survival outcomes of the 2 treatments. Which treatment appears more effective? Why? And what do the “+” symbols on the curves represent?
+Now that a survival curve fits the data, visualize it with a Kaplan-Meier plot using the survminer package and the ggsurvplot() function. Show your plot. Compare the survival outcomes of the 2 treatments. Which treatment appears more effective? Why? And what do the “+” symbols on the curves represent?
 
 ### Q3
 
