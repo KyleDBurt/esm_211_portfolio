@@ -24,21 +24,22 @@ library(survminer)
 raw_quagga <- read.csv(here("data", "Davis_quagga_mussels.csv"))
 ```
 
-# Questions
+# Question 1
 
-### Q1
+### Q1 Part 1
 
-Using the provided data, create a survival object and fit the survival curves separately by treatment. Show/Provide the life tables for both treatments (a life table presents information on the number at risk (number still remaining) and the cumulative survival at that instant).
-
-#### Convert data into tibble
+Convert data into tibble
 
 ```{r}
-quagga_tibble <- as_tibble(raw_quagga)
+quagga_tibble <- as_tibble(raw_quagga) |>
+  mutate(treatment = factor(treatment, levels = c("9_ppm_Ca", "12_ppm_Ca")))
 
 print(quagga_tibble)
 ```
 
-#### Create survival object and fit to a curve separately by treatment
+### Q1 Part 2
+
+Using the provided data, create a survival object and fit the survival curves separately by treatment
 
 ```{r}
 quagga_sfit <- survfit(Surv(day, status) ~ treatment, data = quagga_tibble)
@@ -46,7 +47,9 @@ quagga_sfit <- survfit(Surv(day, status) ~ treatment, data = quagga_tibble)
 plot(quagga_sfit)
 ```
 
-#### Life tables for both treatments
+### Q1 Part 3
+
+Show/Provide the life tables for both treatments (a life table presents information on the number at risk (number still remaining) and the cumulative survival at that instant).
 
 ```{r}
 summary(quagga_sfit)$table
@@ -54,25 +57,39 @@ summary(quagga_sfit)$table
 summary(quagga_sfit)
 ```
 
-### Q2
+# Question 2
 
-Now that a survival curve fits the data, visualize it with a Kaplan-Meier plot using the survminer package and the ggsurvplot() function. Show your plot. Compare the survival outcomes of the 2 treatments. Which treatment appears more effective? Why? And what do the “+” symbols on the curves represent?
+### Q2 Part 1
+
+Now that a survival curve fits the data, visualize it with a Kaplan-Meier plot using the survminer package and the ggsurvplot() function. Show your plot.
 
 ```{r}
 ggsurvplot(quagga_sfit)
 ```
 
-A calcium concentration of 12ppm appears to be more effective because 100% probability of survival persists for a greater amount of time and survival remains higher in this concentration up until the final time point. The “+” symbols represent censored data points.
+### Q2 Part 2
 
-### Q3: problem setting treatments as factors
+Compare the survival outcomes of the 2 treatments. Which treatment appears more effective? Why? And what do the “+” symbols on the curves represent?
 
-Now add confidence intervals to your plot, show the p-value for the log-rank test visually, show a risk table below the plot, and change the colors and the group labels. Interpret the p-value from the log-rank test. What does this p-value indicate about the difference in survival probabilities between the two calcium treatments?
+-   A calcium concentration of 12ppm appears to be more effective because 100% probability of survival persists for a greater amount of time and survival remains higher in this concentration up until the final time point. The “+” symbols represent censored data points.
+
+# Question 3
+
+### Q3 Part 1
+
+Now add confidence intervals to your plot, show the p-value for the log-rank test visually, show a risk table below the plot, and change the colors and the group labels.
 
 ```{r}
 ggsurvplot(quagga_sfit, conf.int = TRUE, pval = TRUE, 
            risk.table = TRUE, 
            legend.labs = c("9 ppm", "12 ppm"), legend.title = "Treatment",  
-           palette = c("mediumorchid", "forestgreen"), 
+           palette = c("purple", "darkgreen"), 
            title = "Kaplan-Meier Curve for Quagga Mussel Survival", 
-           risk.table.height = .15)
+           risk.table.height = 0.35)
 ```
+
+### Q3 Part 2
+
+Interpret the p-value from the log-rank test. What does this p-value indicate about the difference in survival probabilities between the two calcium treatments?
+
+- The value p = 0.005 indicates that it is possible to reject the null hypothesis that there is no difference in survival probabilities between the two calcium treatments.
