@@ -92,4 +92,4 @@ ggsurvplot(quagga_sfit, conf.int = TRUE, pval = TRUE,
 
 Interpret the p-value from the log-rank test. What does this p-value indicate about the difference in survival probabilities between the two calcium treatments?
 
-- The value p = 0.005 indicates that it is possible to reject the null hypothesis that there is no difference in survival probabilities between the two calcium treatments.
+-   The value p = 0.005 indicates that it is possible to reject the null hypothesis that there is no difference in survival probabilities between the two calcium treatments.
