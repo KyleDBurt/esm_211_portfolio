@@ -1,5 +1,5 @@
 ---
-title: "MQMF Portfolio Assignment KEY"
+title: "MQMF Portfolio Assignment"
 format: html
 editor: visual
 ---
@@ -146,6 +146,7 @@ age_range <- 0:30
 
 # 22% (0.22) is a hypothetical value
 harvest_rate = 0.22
+
 # Compute the instantaneous fishing mortality (Ft = −ln(1 − harvest_rate))
 # Ft ≈ 0.2231 or fishing mortality is about 22.3% per year
 instantaneous_fishing_mortality <- -log(1 - harvest_rate) 
@@ -197,13 +198,13 @@ plot_population_vs_catch(age_range, california_halibut_data$population_at_age, c
 
 ### Choose a fish species and find max age, natural mortality, initial population size (just use 1000 if stock assessment difficult to find)
 
-Pacific Sardine 
+Pacific Sardine
 
-- Max age: 1:13
+-   Max age: 0:13
 
-- Natural mortality: 0.4
+-   Natural mortality: 0.4
 
-- Initial population size: 1,617,865,000
+-   Initial population size: 1,617,865,000
 
 ### After finding information, use bce() method to model catch for population, analyze data, and answer the research question
 
@@ -213,38 +214,44 @@ Pacific Sardine
 # ----------------------------------------
 
 # Age range (i.e. 0:20)
-age_range <- NULL
-
+sardine_age_range <- 0:13
 
 # 22% (0.22) is a hypothetical value, adjust it to see how harvest affects your population
-harvest_rate = 0.22
+harvest_rate_sardines = 0.25
+
 # Compute the instantaneous fishing mortality (Ft = −ln(1 − harvest_rate))
 # Ft ≈ 0.2231 or fishing mortality is about 22.3% per year
-instantaneous_fishing_mortality <- -log(1 - harvest_rate) 
+instantaneous_sardine_FishingMortality <- -log(1 - harvest_rate_sardines) 
 
-# Fishing mortality (F) at age (n)
-fishing_mortality_n <- rep(instantaneous_fishing_mortality, length(age_range))
+# Fishing mortality (F) at age (N)
+fishing_mortality_SardineN <- 
+  rep(instantaneous_sardine_FishingMortality, length(sardine_age_range))
 
 # Natural Mortality (M) (i.e. .20)
-M <- NULL
+M_sardines <- 0.4
 
 # Initial population size of 1000 is a hypothetical example
 # Actual population depend on stock assessments and environmental conditions
 # Initial Population (Nt)
-Nt <- NULL
+Nt_sardines <- 1617865000
 
-if (is.null(age_range) | is.null(M) | is.null(Nt)) {
-      stop("Error: Please fill in age range, natural mortality, and population size for your species. If you are having trouble finding them online, please use a value that makes sense.")
+if (is.null(sardine_age_range) | is.null(M_sardines) | 
+    is.null(Nt_sardines)) { stop("Error: Please fill in age range, natural mortality, and population size for your species. If you are having trouble finding them online, please use a value that makes sense.")
 }
 
-bce_data <- bce(M, Fat = fishing_mortality_n, Nt, ages=age_range) 
+bce_sardines <- bce(M_sardines, Fat = fishing_mortality_SardineN, 
+                    Nt_sardines, ages = sardine_age_range) 
 
-print(bce_data)
+print(bce_sardines)
 
-your_species_data <- extract_bce_data(bce_data)
-plot_fish_population(age_range, your_species_data$population_at_age)
+sardine_data <- extract_bce_data(bce_sardines)
 
-# Keep going...
+plot_fish_population(sardine_age_range, sardine_data$population_at_age)
+
+# Plot Species Population and Catch at Age for Species
+plot_population_vs_catch(sardine_age_range, 
+                         sardine_data$population_at_age, 
+                         sardine_data$catch_at_age)
 ```
 
 # **Conservation Recommendation Question:**
@@ -253,6 +260,12 @@ plot_fish_population(age_range, your_species_data$population_at_age)
 
 1.  What is the minimum catch size of your species and why?
 
+- 87735 at age 13 (end of maximum age)
+
 2.  What could be a potential slot limit to also protect large spawners? Why would this be implemented?
 
+- Sardines are fast growing and can reach lengths of up to 41cm, but most individuals are less than 30cm when caught. Since Sardines are fast growing and are often caught in large numbers, it would probably be very difficult to enforce a slot limit.
+
 3.  Why would there be catch limits for your species? What is a real-world example of a catch limit for your species
+
+- Sardines are harvested in large numbers, so catch limits are important to limit this impact on the population. British Columbia's Pacific Sardine fishery was closed in 2015 due to overfishing concerns.
