@@ -39,7 +39,7 @@ This code gets the bioclim data
 #load bioclim data. This data is used for fitting the model and making a pretty graph
 bioclim_data <- worldclim_global(var = "bio",
                                     res = 2.5,
-                                    path = "Data/") 
+                                    path = "data/") 
 ```
 
 This is all the different environmental data stored in this package:
@@ -54,7 +54,7 @@ For this, we're using BIO 1 and BIO 12, Annual Mean Temperature and Annual Preci
 
 ```{r}
 #This is the milkweed data. Need to clean it, and change the names to make it easier to use in later steps
-obs_data_mw <- read_csv(here("Data","Milkweed.csv")) |>
+obs_data_mw <- read_csv(here("data","Milkweed.csv")) |>
   select(gbifID, decimalLatitude, decimalLongitude) |> drop_na()|>
   rename(latitude=decimalLatitude) |> 
   rename(longitude=decimalLongitude)
@@ -74,7 +74,8 @@ geographic_extent <- ext(x = c(min_lon, max_lon, min_lat, max_lat))
 
 # This makes a pretty map for our milkweed data.
 world_map <- world(resolution = 3,
-                   path = "data/")
+                   path = "Data/")
+
 # Crop the map to our area of interest
 my_map <- crop(x = world_map, y = geographic_extent)
 
@@ -158,8 +159,6 @@ bioclim_extract_mw <- terra::extract(x = bioclim_data,
                            ID = FALSE) # No need for an ID column 
 #### for what ever reason, you need to specify that the extract function is coming from the terra package so the "terra::" portion is absolutely critical
 
-
-
 # Add the milkweed occurrence points and extracted climate datasets together
 points_climate_mw <- cbind(all_points_mw, bioclim_extract_mw) 
 
@@ -193,13 +192,16 @@ get_formulas(dependent = "Sp", independent = c("wc2.1_2.5_bio_1", "wc2.1_2.5_bio
              type = "lq", mode = "moderate")
 ```
 
-#Model Calibration
+# Model Calibration
 
 The function calibration_glm() is a general function that allows to perform the following steps:
 
 -   Partition data in k-folds to determine sections of dataset to train the model on and sections to test it on
+
 -   Create formulas for candidate models
+
 -   Fit and evaluate candidate models
+
 -   Select best performing models
 
 Model selection consists of three steps:
@@ -219,7 +221,8 @@ The list of partition indices (*$kfold_index_partition) - we are doing 5 folds, 
 points_climate_mw <- as.data.frame(points_climate_mw, xy = TRUE)
 
 calibration <- calibration_glm(data = points_climate_mw, dependent = "pa",
-                               independent = c("wc2.1_2.5m_bio_1", "wc2.1_2.5m_bio_12"),
+                               independent = c("wc2.1_2.5m_bio_1", 
+                                               "wc2.1_2.5m_bio_12"),
                                response_type = "lpq",
                                formula_mode = "moderate", 
                                exclude_bimodal = TRUE, 
@@ -251,16 +254,17 @@ E - Model can extrapolate trends to any environmental conditions (temps or preci
   
 fits <- fit_selected(calibration) 
 
- #Prediction for the two selected models and their consensus
-preds_E  <- predict_selected(fits, newdata = bioclim_data, extrapolation_type = "E",
+#Prediction for the two selected models and their consensus
+preds_E  <- predict_selected(fits, newdata = bioclim_data, 
+                             extrapolation_type = "E",
                              consensus = TRUE)
-preds_NE <- predict_selected(fits, newdata = bioclim_data,extrapolation_type = "EC",
+preds_NE <- predict_selected(fits, newdata = bioclim_data, 
+                             extrapolation_type = "EC",
                              consensus = TRUE)
 
 #They will not be different because the both are confined to the same range as the training data
 
 # Visualization of the Models
-
 plot(c(preds_E$predictions, preds_NE$predictions),
      main = c("Probability of Milkweed Occurrences (E)",
               "Probability of Milkweed Occurrences (EC)"),
@@ -275,6 +279,7 @@ The following lines of code help to do so:
 
 ```{r}
 response_curve(fitted = fits, modelID = "ModelID_7", variable = "wc2.1_2.5m_bio_1")
+
 response_curve(fitted = fits, modelID = "ModelID_7", variable = "wc2.1_2.5m_bio_12")
 ```
 
@@ -284,18 +289,58 @@ END OF CLASS SECTION
 
 Run the demo but with the monarch data set.
 
-Other notes:
-- Clean the dataset for n/as
-- Create an ecological niche model for Monarchs
+Other notes: 
+
+- Clean the dataset for n/as 
+
+- Create an ecological niche model for Monarchs 
+
 - Compare the two niche models
 
 ## Load, Clean, and Create Pseudo Absence Data
 
-```{r}
+### Load and clean data
 
+```{r}
+monarch_obs_data <- read_csv(here("data", "Monarch.csv")) |>
+  select(gbifID, decimalLatitude, decimalLongitude) |> 
+  drop_na()|>
+  rename(latitude=decimalLatitude) |> 
+  rename(longitude=decimalLongitude)
 ```
 
-**Plot the monarch data. What are the differences and similarities between the monarch map and the milkweed map that we made in the demo?**
+### Plot the monarch data. What are the differences and similarities between the monarch map and the milkweed map that we made in the demo?
+
+```{r}
+# Set the extent for the monarch data we want to focus on
+max_lat_monarch <- ceiling(max(monarch_obs_data$latitude))
+min_lat_monarch <- floor(min(monarch_obs_data$latitude))
+max_lon_monarch <- ceiling(max(monarch_obs_data$longitude))
+min_lon_monarch <- floor(min(monarch_obs_data$longitude))
+
+# Store boundaries in a single extent object
+geographic_extent_monarch <- ext(x = c(min_lon_monarch, max_lon_monarch, 
+                                       min_lat_monarch, max_lat_monarch))
+
+# This makes a pretty map for our milkweed data.
+world_map_monarch <- world(resolution = 3, path = "Data/")
+
+# Crop the map to our area of interest
+monarch_map <- crop(x = world_map_monarch, y = geographic_extent_monarch)
+
+# Plot the base map
+plot(monarch_map, axes = TRUE, col = "grey95")
+
+# Add the points for individual observations
+points(x = monarch_obs_data$longitude, y = monarch_obs_data$latitude,
+       col = "darkgreen", pch = 20, cex = 0.75)
+```
+
+- Similarity: Observations are widespread in general
+
+- Difference: Monarchs are more clustered near the city of Santa Barbara
+
+### Pseudo-absences
 
 ## Use the calibration_glm() Function to Identify Best Model
 
