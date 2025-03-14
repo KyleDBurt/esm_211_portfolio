@@ -140,7 +140,6 @@ plot_population_vs_catch <- function(age_range, population_at_age, catch_at_age)
 ## Baranov Catch Equation Setup
 
 ```{r}
-
 # Age range of California halibut 
 #(California halibut can live up to 30 years, individuals older than 15 years are rare)
 age_range <- 0:30
@@ -195,9 +194,18 @@ plot_population_vs_catch(age_range, california_halibut_data$population_at_age, c
 ```
 
 # Now It's you turn:
-- Choose a fish species and find max age, natural mortality, initial population size (just use 1000 if stock assessment difficult to find)
-- Chris: check out FishBase
-- After finding information, use bce() method to model catch for population, analyze data, and answer the research question
+
+### Choose a fish species and find max age, natural mortality, initial population size (just use 1000 if stock assessment difficult to find)
+
+Pacific Sardine 
+
+- Max age: 1:13
+
+- Natural mortality: 0.4
+
+- Initial population size: 1,617,865,000
+
+### After finding information, use bce() method to model catch for population, analyze data, and answer the research question
 
 ```{r}
 # ----------------------------------------
@@ -239,18 +247,12 @@ plot_fish_population(age_range, your_species_data$population_at_age)
 # Keep going...
 ```
 
-## **Conservation Recommendation Question:**
+# **Conservation Recommendation Question:**
 
 (Recommendations dependent on species reproduction age, size at age, and catch rate)
 
 1.  What is the minimum catch size of your species and why?
 
-2.  What could be a potential slot limit to also protect large spawners? Why would this be implemented?\
-
-    \
+2.  What could be a potential slot limit to also protect large spawners? Why would this be implemented?
 
 3.  Why would there be catch limits for your species? What is a real-world example of a catch limit for your species
-
-##### 
-
-##### Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
