@@ -110,7 +110,8 @@ plot(bioclim_data[[1]]) #this is a good way to make sure the boundaries are good
 This is how we get pseudo-absences out of the milkweed data. We have recorded occurrences, but we need absence data to run the model, so we generate pseudo-absences by random sampling background points, and considering points without occurrences as absences.
 
 ```{r}
-set.seed(1234) #Given we are carrying out random sampling, this ensures we get the same results every time. You can always change it to your favorite number
+set.seed(1234) 
+#Given we are carrying out random sampling, this ensures we get the same results every time. You can always change it to your favorite number
 
 # Randomly sample points (same number as our observed points)
 background_mw <- spatSample(x = bioclim_data,
@@ -153,7 +154,7 @@ points(bioclim_points_vect, col = ifelse(all_points_mw$pa == 1, "blue", "red"),
 ## Thin bioclim datasets and combine with milkweed occurrences
 
 ```{r}
-#extract geospatial bioclim data based on milkweed occurrences by lat and long, producing a matrix of bioclim data relevant to the milkweed occurrences
+# extract geospatial bioclim data based on milkweed occurrences by lat and long, producing a matrix of bioclim data relevant to the milkweed occurrences
 bioclim_extract_mw <- terra::extract(x = bioclim_data,
                            y = all_points_mw[, c("longitude", "latitude")],
                            ID = FALSE) # No need for an ID column 
@@ -342,36 +343,139 @@ points(x = monarch_obs_data$longitude, y = monarch_obs_data$latitude,
 
 ### Pseudo-absences
 
+```{r}
+# Randomly sample points (same number as our observed points)
+background_monarch <- spatSample(x = bioclim_data, size = 500, 
+                                 values = FALSE, na.rm = TRUE, xy = TRUE) 
+
+# Pull out coordinate columns, x (longitude) first, then y (latitude) from
+# Monarch data
+presence_monarch  <- monarch_obs_data[, c("longitude", "latitude")]
+
+# Add column indicating presence - pa for presence vs absence
+presence_monarch$pa <- 1
+
+# Convert background data (where Monarch has not been recorded as occurring) to a data frame
+absence_monarch <- as.data.frame(background_monarch)
+
+# Update column names so they match presence points
+colnames(absence_monarch) <- c("longitude", "latitude")
+
+# Add pseudo-absence values to pa as 0 to indicate absence
+absence_monarch$pa <- 0
+
+# Join data into single data frame
+all_monarch_points <- rbind(presence_monarch, absence_monarch)
+```
+
+### Plot presence-absence points on a bioclim raster for visual data exploration
+
+```{r}
+# Convert the dataframe to a SpatVector (spatial points object)
+bioclim_MonarchPoints_vect <- vect(all_monarch_points, 
+                                   geom = c("longitude", 
+                                            "latitude"), 
+                                   crs = "EPSG:4326")
+
+# Plot the first bioclimatic raster layer (mean annual temperature)
+plot(bioclim_data[[1]], 
+     main = "Mean Annual Temp Bioclim Data with Presence-Absence Points")
+
+# Add points and colors to distinguish
+points(bioclim_MonarchPoints_vect, 
+       col = ifelse(all_monarch_points$pa == 1, "blue", "red"), 
+       pch = 20, cex = 1.0)
+```
+
 ## Use the calibration_glm() Function to Identify Best Model
 
-*\*Hint* you may need to inspect the data going into the calibration_glm() function.
-
-**What is the best model?**
+### Thin bioclim datasets and combine with Monarch occurrences
 
 ```{r}
+# extract geospatial bioclim data based on Monarch occurrences by lat and long, producing a matrix of bioclim data relevant to the Monarch occurrences
+bioclim_monarch_extract <- terra::extract(x = bioclim_data,
+                           y = all_monarch_points[, 
+                                                  c("longitude", 
+                                                    "latitude")],
+                           ID = FALSE)
 
+# Add the Monarch occurrence points and extracted climate datasets together
+points_climate_monarch <- cbind(all_monarch_points, 
+                                bioclim_monarch_extract) 
+
+# select the bioclim variables we are using in our model (i.e. bioclim 1 (mean annual temperature) and bioclim 12(mean annual precip)), along with the locations and presence-absence data from the larger dataset
+points_climate_monarch <- points_climate_monarch  |> 
+  select(longitude, latitude, pa, wc2.1_2.5m_bio_1, wc2.1_2.5m_bio_12)
 ```
 
-## Fit and Create Projections for the Selected Model
-
-**What is the model saying for monarchs?**
+### *\*Hint* you may need to inspect the data going into the calibration_glm() function.
 
 ```{r}
+points_climate_MonarchData <- as.data.frame(points_climate_monarch, 
+                                            xy = TRUE)
 
+cleaned_PointsClimate_MonarchData <- 
+  points_climate_MonarchData[complete.cases(points_climate_MonarchData), ]
 ```
 
-## Create a Response Curve for the Two Environmental Parameters
-
-**What are the response curves saying about the two environmental parameters?**
+### Calibration
 
 ```{r}
+calibration_monarch <- 
+  calibration_glm(data = cleaned_PointsClimate_MonarchData, 
+                  dependent = "pa", independent = 
+                    c("wc2.1_2.5m_bio_1", "wc2.1_2.5m_bio_12"), 
+                  response_type = "lpq", formula_mode = "moderate", 
+                  exclude_bimodal = TRUE, selection_criterion = "TSS", 
+                  cv_kfolds = 5, verbose = FALSE)
 
+print(calibration_monarch)
+
+summary(calibration_monarch)
 ```
+
+- ModelID_6 is the best model 
+
+## Fit and Create Projections for the Selected Model. What is the model saying for monarchs?
+
+```{r}
+fit_monarch <- fit_selected(calibration_monarch) 
+
+#Prediction for the selected model
+preds_monarch_E  <- predict_selected(fit_monarch, newdata = bioclim_data, 
+                                     extrapolation_type = "E", 
+                                     consensus = TRUE)
+
+# Visualization of the Models
+plot(preds_monarch_E$predictions, 
+     main = "Probability of Monarch Occurrences",
+     mar = c(1, 1, 2, 5))
+```
+
+- The model shows that Monarchs are more likely to occur in southern Santa Barbara County and coastal Ventura County
+
+## Create a Response Curve for the Two Environmental Parameters.What are the response curves saying about the two environmental parameters?
+
+```{r}
+response_curve(fitted = fit_monarch, modelID = "ModelID_6", 
+               variable = "wc2.1_2.5m_bio_1")
+
+response_curve(fitted = fit_monarch, modelID = "ModelID_6", 
+               variable = "wc2.1_2.5m_bio_12")
+```
+
+- The response curves show Monarchs are most likely to occur when annual mean temperature is greater than 14C and when annual precipitation is between 300-750mm.
 
 ## Compare the Model Progections and Response Curves of the Milkweed and Monarch Data Sets
 
-**Where would you expect monarchs to be seen due to the presence of milkweed but there were no observations of monarchs? What is a probable explanation for that?**
+### Where would you expect monarchs to be seen due to the presence of milkweed but there were no observations of monarchs? What is a probable explanation for that?
 
-**Where would you expect milkweed to be seen due to the presence of monarchs but there were no observations of milkweed? What is a probable explanation for that?**
+- There are a lot of Milkweed observations in the Santa Ynez Valley, but Monarch observations are concentrated along the coast. An explanation for this is that there are overwintering sites in coastal Santa Barbara county (like Elwood Mesa) where Monarch congregate.
 
-**Are there any other surprises in the models or the data?**
+### Where would you expect milkweed to be seen due to the presence of monarchs but there were no observations of milkweed? What is a probable explanation for that?
+
+- Based on the response curves, Milkweed prefers slightly drier areas. As such, it makes sense why there are more inland observations.
+
+### Are there any other surprises in the models or the data?
+
+- It is interesting that there are only a few records of Monarchs in the Channel Islands.
