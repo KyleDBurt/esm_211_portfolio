@@ -40,7 +40,7 @@ colnames(trans)[2:7] <- c("year", "stage", "fruits", "year2", "fate", "fruits2")
 
 ## B. Calculate and add fertility rate to the stage-fate data frame.
 
-Calculating fertility rates will allow us to determine the reproductive success of each individual. It is also necessary to produce the projection matrix when individual fertility rates are averaged by stage. When census data lacks information on the direct number of offspring (ie. seeds produced by plants), a relative fertility rate could be used instead. The relative fertility is calculcated by finding the proportion of total reproductive output attributable to an individual times the total number of seedlings at the end of the projection interval.
+Calculating fertility rates will allow us to determine the reproductive success of each individual. It is also necessary to produce the projection matrix when individual fertility rates are averaged by stage. When census data lacks information on the direct number of offspring (ie. seeds produced by plants), a relative fertility rate could be used instead. The relative fertility is calculated by finding the proportion of total reproductive output attributable to an individual times the total number of seedlings at the end of the projection interval.
 
 ```{r}
 #########################
@@ -55,7 +55,6 @@ seedlings02 <- nrow(subset(trans, year == 2002 & stage == "seedling"))
 
 # calculate the relative fertility rate of each plant and store it in a new "seedling" column
 trans01$seedling <- trans01$fruits/sum(trans01$fruits) * seedlings02
-
 ```
 
 ```{r}
@@ -122,7 +121,6 @@ n01 <- c(6,2,3)
 
 # project population growth over 15 years
 p01 <- pop.projection(A01, n01, 15)
-
 ```
 
 ```{r}
@@ -161,12 +159,29 @@ hudsonia <- hudsonia
 
 # What is the population growth rate for each year of available data (1985-1988)? Use the deterministic approach.
 
-### Population growth rate 1985
-
 ```{r}
-
+for (year in names(hudsonia)) {
+  lambda_hudsonia <- lambda(hudsonia[[year]])
+  cat("Year:", year, "Lambda:", lambda_hudsonia, "\n")
+}
 ```
 
+- 1985: 0.9593438
+
+- 1986: 1.009809
+
+- 1987: 0.8453119
+
+- 1988: 1.01832
+
 ### What is the stochastic growth rate?
+
+```{r}
+set.seed(123)
+
+hudsonia_stochastic_growth <- stoch.growth.rate(hudsonia)
+
+cat("Stochastic Growth Rate (a_s):", hudsonia_stochastic_growth$approx, "\n")
+```
 
 ### Compare the growth rates calculated using the two methods. How are they different? Why?
