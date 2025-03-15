@@ -184,8 +184,8 @@ hudsonia_stochastic_growth <- stoch.growth.rate(hudsonia)
 cat("Stochastic Growth Rate (a_s):", hudsonia_stochastic_growth$approx, "\n")
 ```
 
-- Stochastic Growth Rate: -0.03712598
+-   Stochastic Growth Rate: -0.03712598
 
 ### Compare the growth rates calculated using the two methods. How are they different? Why?
 
-- The deterministic method shows positive values, while the stochastic method shows a negative value. There are differences as a result of the randomness and uncertainty associated with the stochastic method.
+-   The deterministic method shows positive values, while the stochastic method shows a negative value. There are differences as a result of the randomness and uncertainty associated with the stochastic method.
